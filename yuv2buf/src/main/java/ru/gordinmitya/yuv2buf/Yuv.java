@@ -109,13 +109,13 @@ abstract public class Yuv {
     private static ByteBuffer prepareOutput(ImageWrapper image, ByteBuffer reuse) {
         int sizeOutput = image.width * image.height * 3 / 2;
         ByteBuffer output;
-        if (reuse == null || reuse.capacity() != sizeOutput || reuse.isReadOnly()) {
-            // as long as input buffer is direct
-            // TODO benchmark direct vs heap
+        if (reuse == null
+                || reuse.capacity() < sizeOutput
+                || reuse.isReadOnly()
+                || !reuse.isDirect()) {
             output = ByteBuffer.allocateDirect(sizeOutput);
-        } else {
+        } else
             output = reuse;
-        }
         output.rewind();
         return output;
     }
