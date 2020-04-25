@@ -1,5 +1,7 @@
 # Android Camera Api2 / CameraX YUV to ByteBuffer
 
+![](https://github.com/gordinmitya/yuv2buf/workflows/Android%20CI/badge.svg)
+
 **Motivation:**
 
 When you're attempting to get an `Image` from `ImageReader` or `ImageAnalysis.Analyzer` you actually get 3 separate `ByteBuffers` which you can't pass to further processing. You have to merge them but that also is not easy because they are full of row and pixel strides.
