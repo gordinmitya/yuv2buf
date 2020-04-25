@@ -10,7 +10,6 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
     }
 
@@ -24,10 +23,7 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.camera:camera-core:1.0.0-beta03'
 
     testImplementation 'junit:junit:4.13'
-//    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

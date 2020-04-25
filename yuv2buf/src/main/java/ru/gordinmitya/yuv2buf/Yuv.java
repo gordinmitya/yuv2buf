@@ -255,14 +255,14 @@ abstract public class Yuv {
     static class PlaneWrapper {
         final int width, height;
         final ByteBuffer buffer;
-        final int pixelStride, rowStride;
+        final int rowStride, pixelStride;
 
-        PlaneWrapper(int width, int height, ByteBuffer buffer, int pixelStride, int rowStride) {
+        PlaneWrapper(int width, int height, ByteBuffer buffer, int rowStride, int pixelStride) {
             this.width = width;
             this.height = height;
             this.buffer = buffer;
-            this.pixelStride = pixelStride;
             this.rowStride = rowStride;
+            this.pixelStride = pixelStride;
         }
     }
 }

@@ -70,8 +70,8 @@ class YuvCommon {
                 width,
                 height,
                 buffer,
-                1,
-                rowStride
+                rowStride,
+                1
         );
     }
 
@@ -92,8 +92,8 @@ class YuvCommon {
         v.put(array, 1, array.length - 1);
         v.rewind();
         return new Yuv.PlaneWrapper[]{
-                new Yuv.PlaneWrapper(width, height, u, 2, rowStride),
-                new Yuv.PlaneWrapper(width, height, v, 2, rowStride)
+                new Yuv.PlaneWrapper(width, height, u, rowStride, 2),
+                new Yuv.PlaneWrapper(width, height, v, rowStride, 2)
         };
     }
 }
