@@ -23,10 +23,12 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
+    val movingAverageSize = 64
 
     private lateinit var analysisExecutor: ExecutorService
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var imageAnalyzer: CompositeConverter
+    private lateinit var resultAverages: Array<MovingAverage>
     private lateinit var resultViews: Array<View>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,12 +38,13 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
             initCamera()
         else
             requestPermissions()
-        
+
         analysisExecutor = Executors.newSingleThreadExecutor()
         val converters = arrayOf(
             OpenCVConverter(),
             RenderScriptConverter(this)
         )
+        resultAverages = Array(converters.size) { MovingAverage(movingAverageSize) }
         resultViews = Array(converters.size) {
             return@Array layoutInflater.inflate(R.layout.item_converted, list_results, false)
         }
@@ -61,10 +64,12 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
     override fun onAnalyzed(results: List<ConversionResult>) {
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
         results.forEachIndexed { index, result ->
+            val average = resultAverages[index]
+            average.add(result.time)
             resultViews[index].let {
                 it.image.setImageBitmap(result.image)
                 it.text_name.text = result.method
-                it.text_time.text = "${result.time}ms"
+                it.text_time.text = "${result.time}ms\n$average"
             }
         }
     }
