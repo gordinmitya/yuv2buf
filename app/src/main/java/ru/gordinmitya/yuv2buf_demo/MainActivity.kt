@@ -61,8 +61,9 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onAnalyzed(results: List<ConversionResult>) {
+    override fun onAnalyzed(size: Pair<Int, Int>, results: List<ConversionResult>) {
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
+        text_size.text = "${size.first}x${size.second}"
         results.forEachIndexed { index, result ->
             val average = resultAverages[index]
             average.add(result.time)

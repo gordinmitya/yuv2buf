@@ -10,6 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <TextView
+        android:id="@+id/text_size"
+        style="@style/TextOverlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        tools:text="600x800" />
+
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="320dp"

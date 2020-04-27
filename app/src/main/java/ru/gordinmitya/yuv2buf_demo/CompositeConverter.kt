@@ -28,12 +28,17 @@ class CompositeConverter(
             ConversionResult(converter.getName(), bitmap, end - start)
         }
         handler.post {
-            listener.onAnalyzed(results)
+            val size =
+                if (image.imageInfo.rotationDegrees > 0 && image.imageInfo.rotationDegrees % 90 == 0)
+                    image.height to image.width
+                else
+                    image.width to image.height
+            listener.onAnalyzed(size, results)
         }
         image.close()
     }
 
     interface Listener {
-        fun onAnalyzed(results: List<ConversionResult>)
+        fun onAnalyzed(size: Pair<Int, Int>, results: List<ConversionResult>)
     }
 }
