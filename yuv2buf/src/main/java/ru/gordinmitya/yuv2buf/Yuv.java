@@ -1,5 +1,6 @@
 package ru.gordinmitya.yuv2buf;
 
+import android.graphics.ImageFormat;
 import android.media.Image;
 
 import androidx.camera.core.ImageProxy;
@@ -11,8 +12,14 @@ abstract public class Yuv {
         Public types.
      */
     public enum Type {
-        YUV_NV21,
-        YUV_420
+        YUV_NV21(ImageFormat.NV21),
+        YUV_420(ImageFormat.YUV_420_888);
+
+        public final int format;
+
+        Type(int format) {
+            this.format = format;
+        }
     }
 
     public static class Converted {
