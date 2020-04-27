@@ -1,9 +1,14 @@
 package ru.gordinmitya.yuv2buf_demo
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -27,12 +32,12 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        if (allPermissionsGranted(this))
+            initCamera()
+        else
+            requestPermissions()
+        
         analysisExecutor = Executors.newSingleThreadExecutor()
-        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener(Runnable {
-            val cameraProvider = cameraProviderFuture.get()
-            preview_view.post { bindCameraX(cameraProvider) }
-        }, ContextCompat.getMainExecutor(this))
         val converters = arrayOf(
             OpenCVConverter(),
             RenderScriptConverter(this)
@@ -42,6 +47,14 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
         }
         resultViews.forEach { list_results.addView(it) }
         imageAnalyzer = CompositeConverter(this, Handler(), *converters)
+    }
+
+    private fun initCamera() {
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener(Runnable {
+            val cameraProvider = cameraProviderFuture.get()
+            preview_view.post { bindCameraX(cameraProvider) }
+        }, ContextCompat.getMainExecutor(this))
     }
 
     @SuppressLint("SetTextI18n")
@@ -75,5 +88,41 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
     override fun onDestroy() {
         super.onDestroy()
         analysisExecutor.shutdown()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode != REQUEST_CODE_PERMISSIONS) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            return
+        }
+        if (!allPermissionsGranted(this)) {
+            // TODO message
+            Toast.makeText(this, "As you wish ¯\\_(ツ)_/¯", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+        initCamera()
+    }
+
+    private fun requestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(
+                REQUIRED_PERMISSIONS,
+                REQUEST_CODE_PERMISSIONS
+            )
+        }
+    }
+
+    companion object {
+        private const val REQUEST_CODE_PERMISSIONS = 10
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+
+        fun allPermissionsGranted(context: Context) = REQUIRED_PERMISSIONS.all {
+            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
     }
 }
