@@ -7,11 +7,14 @@ import android.graphics.Matrix
 import android.renderscript.*
 import androidx.camera.core.ImageProxy
 import ru.gordinmitya.yuv2buf.Yuv
+import java.nio.ByteBuffer
 
 
 class RenderScriptConverter(context: Context) : ImageConverter {
     val rs = RenderScript.create(context)
     val intrinsic = ScriptIntrinsicYuvToRGB.create(rs, Element.RGBA_8888(rs))
+
+    private var reuseBuffer: ByteBuffer? = null
 
     var input: Allocation? = null
     var bytes: ByteArray = ByteArray(0)
@@ -20,7 +23,9 @@ class RenderScriptConverter(context: Context) : ImageConverter {
     override fun getName(): String = "RenderScript"
 
     override fun convert(image: ImageProxy): Bitmap {
-        val converted = Yuv.toBuffer(image)
+        val converted = Yuv.toBuffer(image, reuseBuffer)
+        reuseBuffer = converted.buffer
+
         if (input == null
             || input!!.type.x != image.width
             || input!!.type.y != image.height

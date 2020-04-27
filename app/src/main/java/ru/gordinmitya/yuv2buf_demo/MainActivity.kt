@@ -33,10 +33,14 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
             val cameraProvider = cameraProviderFuture.get()
             preview_view.post { bindCameraX(cameraProvider) }
         }, ContextCompat.getMainExecutor(this))
-        val converters = arrayOf(RenderScriptConverter(this))
-        resultViews = Array<View>(converters.size) {
-            return@Array layoutInflater.inflate(R.layout.item_converted, list_results)
+        val converters = arrayOf(
+            OpenCVConverter(),
+            RenderScriptConverter(this)
+        )
+        resultViews = Array(converters.size) {
+            return@Array layoutInflater.inflate(R.layout.item_converted, list_results, false)
         }
+        resultViews.forEach { list_results.addView(it) }
         imageAnalyzer = CompositeConverter(this, Handler(), *converters)
     }
 

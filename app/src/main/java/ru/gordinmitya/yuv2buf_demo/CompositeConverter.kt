@@ -20,11 +20,12 @@ class CompositeConverter(
     ImageAnalysis.Analyzer, LifecycleObserver {
 
     override fun analyze(image: ImageProxy) {
-        val results = functions.map {
+        val results = functions.map { converter ->
+            image.planes.forEach { plane -> plane.buffer.rewind() }
             val start = System.currentTimeMillis()
-            val bitmap = it.convert(image)
+            val bitmap = converter.convert(image)
             val end = System.currentTimeMillis()
-            ConversionResult(it.getName(), bitmap, end - start)
+            ConversionResult(converter.getName(), bitmap, end - start)
         }
         handler.post {
             listener.onAnalyzed(results)

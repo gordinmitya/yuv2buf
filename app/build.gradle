@@ -45,5 +45,9 @@ dependencies {
     implementation "androidx.camera:camera-view:1.0.0-alpha10"
     // If you want to additionally use the CameraX Extensions library
     implementation "androidx.camera:camera-extensions:1.0.0-alpha10"
+
     implementation project(path: ':yuv2buf')
+
+    // https://github.com/quickbirdstudios/opencv-android
+    implementation 'com.quickbirdstudios:opencv:4.1.0'
 }

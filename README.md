@@ -26,8 +26,8 @@ The whole library is a single file, you can just copy [Yuv.java](yuv2buf/src/mai
 - [x] make the library;
 - [x] write unit tests;
 - [x] add RenderScript example;
+- [x] add OpenCV example;
 - [ ] publish to jcenter;
-- [ ] add OpenCV example;
 - [ ] add MNN example;
 - [ ] add TFLite example;
 - [ ] support format conversions.
