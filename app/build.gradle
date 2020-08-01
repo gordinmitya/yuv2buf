@@ -6,6 +6,8 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
 
+    ndkVersion "21.3.6528147"
+
     defaultConfig {
         applicationId "ru.gordinmitya.yuv2buf_demo"
         minSdkVersion 21
