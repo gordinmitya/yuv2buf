@@ -62,11 +62,11 @@ public class YuvCommonTest {
         assertPlaneParams(image.y, width, height, rowStride, 1);
         assertCompactPlane(image.y, Y);
 
-        assertPlaneParams(image.u, width / 2, height / 2, rowStride, 2);
-        assertComplexPlane(image.u, U, 0);
-
         assertPlaneParams(image.v, width / 2, height / 2, rowStride, 2);
-        assertComplexPlane(image.v, V, 1);
+        assertComplexPlane(image.v, V, 0);
+
+        assertPlaneParams(image.u, width / 2, height / 2, rowStride, 2);
+        assertComplexPlane(image.u, U, 1);
     }
 
     private static void assertPlaneParams(Yuv.PlaneWrapper plane, int width, int height, int rowStride, int pixelStride) {

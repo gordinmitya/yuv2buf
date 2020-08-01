@@ -50,7 +50,7 @@ public class YuvNV21Test {
             assertEquals(Y, array[i]);
 
         for (int i = sizeY; i < sizeTotal; i++) {
-            byte expected = i % 2 == 0 ? U : V;
+            byte expected = i % 2 == 0 ? V : U;
             assertEquals(expected, array[i]);
         }
     }

@@ -155,8 +155,8 @@ abstract public class Yuv {
                 removePaddingNotCompact(image, output, sizeLuma);
             } else {
                 output.position(sizeLuma);
-                output.put(image.u.buffer);
-                byte lastOne = image.v.buffer.get(image.v.buffer.capacity() - 1);
+                output.put(image.v.buffer);
+                byte lastOne = image.u.buffer.get(image.u.buffer.capacity() - 1);
                 output.put(lastOne);
             }
         }
@@ -187,10 +187,10 @@ abstract public class Yuv {
         ByteBuffer row;
         dst.position(offset);
         for (int i = 0; i < height - 1; i++) {
-            row = clipBuffer(image.u.buffer, i * rowStride, width * 2);
+            row = clipBuffer(image.v.buffer, i * rowStride, width * 2);
             dst.put(row);
         }
-        row = clipBuffer(image.v.buffer, (height - 1) * rowStride - 1, width * 2);
+        row = clipBuffer(image.u.buffer, (height - 1) * rowStride - 1, width * 2);
         dst.put(row);
     }
 

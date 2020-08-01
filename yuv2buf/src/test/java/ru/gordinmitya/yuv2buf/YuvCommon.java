@@ -40,7 +40,7 @@ class YuvCommon {
             u = makeCompact(U, width / 2, height / 2, stride);
             v = makeCompact(V, width / 2, height / 2, stride);
         } else {
-            Yuv.PlaneWrapper[] planes = makeNV21_UV(width / 2, height / 2, rowStride);
+            Yuv.PlaneWrapper[] planes = makeNV21_VU(width / 2, height / 2, rowStride);
             u = planes[0];
             v = planes[1];
         }
@@ -75,22 +75,25 @@ class YuvCommon {
         );
     }
 
-    private static Yuv.PlaneWrapper[] makeNV21_UV(int width, int height, int rowStride) {
+    private static Yuv.PlaneWrapper[] makeNV21_VU(int width, int height, int rowStride) {
         assert rowStride >= width * 2;
         // +1 because we're making it for 2 planes
         int size = getBufferSize(width, height, rowStride, 2) + 1;
         byte[] array = new byte[size];
         Arrays.fill(array, P);
         for (int i = 0; i < width * 2; i++)
-            array[i] = i % 2 == 0 ? U : V;
+            array[i] = i % 2 == 0 ? V : U;
         for (int i = 1; i < height; i++)
             System.arraycopy(array, 0, array, i * rowStride, width * 2);
-        ByteBuffer u = ByteBuffer.allocateDirect(array.length - 1);
-        u.put(array, 0, array.length - 1);
-        u.rewind();
+
         ByteBuffer v = ByteBuffer.allocateDirect(array.length - 1);
-        v.put(array, 1, array.length - 1);
+        v.put(array, 0, array.length - 1);
         v.rewind();
+
+        ByteBuffer u = ByteBuffer.allocateDirect(array.length - 1);
+        u.put(array, 1, array.length - 1);
+        u.rewind();
+
         return new Yuv.PlaneWrapper[]{
                 new Yuv.PlaneWrapper(width, height, u, rowStride, 2),
                 new Yuv.PlaneWrapper(width, height, v, rowStride, 2)
