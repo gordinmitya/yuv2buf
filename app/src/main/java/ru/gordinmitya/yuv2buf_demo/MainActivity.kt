@@ -7,8 +7,14 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -122,6 +128,33 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
                 REQUEST_CODE_PERMISSIONS
             )
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_help -> {
+                showHelp()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showHelp() {
+        val alertDialog = AlertDialog.Builder(this)
+            .setIcon(R.drawable.ic_help_outline)
+            .setMessage(R.string.help_message)
+            .create()
+        alertDialog.show()
+
+        val textView = alertDialog.findViewById<TextView>(android.R.id.message)!!
+        Linkify.addLinks(textView, Linkify.WEB_URLS)
+        textView.movementMethod = LinkMovementMethod.getInstance()
     }
 
     companion object {
