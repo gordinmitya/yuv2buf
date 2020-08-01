@@ -34,7 +34,9 @@ class MNNConverter(context: Context) : ImageConverter {
         outputTensor = session.getOutput(null)
     }
 
-    override fun convert(image: ImageProxy): Bitmap {
+    override fun convert(image: ImageProxy): Pair<Bitmap, Long> {
+        val tik = System.currentTimeMillis()
+
         val converted = Yuv.toBuffer(image, reuseBuffer)
         reuseBuffer = converted.buffer
 
@@ -73,6 +75,9 @@ class MNNConverter(context: Context) : ImageConverter {
             matrix
         )
         val data = inputTensor.floatData
+
+        val tok = System.currentTimeMillis()
+
         val pixels = MNNHelperNative.nativeConvertMaskToPixelsMultiChannels(data)
         val bitmap =
             Bitmap.createBitmap(pixels, trueSize.width, trueSize.height, Bitmap.Config.ARGB_8888)
@@ -82,6 +87,6 @@ class MNNConverter(context: Context) : ImageConverter {
         // we'll do it in CompositeConverter
         // image.close()
 
-        return bitmap
+        return bitmap to tok - tik
     }
 }

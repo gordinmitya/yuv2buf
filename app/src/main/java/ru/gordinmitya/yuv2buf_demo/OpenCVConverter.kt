@@ -16,7 +16,9 @@ class OpenCVConverter() : ImageConverter {
 
     private var reuseBuffer: ByteBuffer? = null
 
-    override fun convert(image: ImageProxy): Bitmap {
+    override fun convert(image: ImageProxy): Pair<Bitmap, Long> {
+        val tik = System.currentTimeMillis()
+
         val converted = Yuv.toBuffer(image, reuseBuffer)
         reuseBuffer = converted.buffer
 
@@ -28,6 +30,8 @@ class OpenCVConverter() : ImageConverter {
             Mat(image.height + image.height / 2, image.width, CvType.CV_8UC1, converted.buffer)
         val rgbMat = Mat(image.height, image.width, CvType.CV_8UC4)
         Imgproc.cvtColor(yuvMat, rgbMat, format)
+
+        val tok = System.currentTimeMillis()
 
         if (image.imageInfo.rotationDegrees != 0) {
             Core.rotate(rgbMat, rgbMat, image.imageInfo.rotationDegrees / 90 - 1)
@@ -41,6 +45,6 @@ class OpenCVConverter() : ImageConverter {
         // we'll do it in CompositeConverter
         // image.close()
 
-        return bitmap
+        return bitmap to tok - tik
     }
 }

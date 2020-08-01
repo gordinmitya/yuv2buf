@@ -22,7 +22,9 @@ class RenderScriptConverter(context: Context) : ImageConverter {
 
     override fun getName(): String = "RenderScript"
 
-    override fun convert(image: ImageProxy): Bitmap {
+    override fun convert(image: ImageProxy): Pair<Bitmap, Long> {
+        val tik = System.currentTimeMillis()
+
         val converted = Yuv.toBuffer(image, reuseBuffer)
         reuseBuffer = converted.buffer
 
@@ -50,6 +52,8 @@ class RenderScriptConverter(context: Context) : ImageConverter {
 
         intrinsic.forEach(out)
 
+        val tok = System.currentTimeMillis()
+
         var bitmap = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
         out!!.copyTo(bitmap)
 
@@ -72,6 +76,6 @@ class RenderScriptConverter(context: Context) : ImageConverter {
         // we'll do it in CompositeConverter
         // image.close()
 
-        return bitmap
+        return bitmap to tok - tik
     }
 }

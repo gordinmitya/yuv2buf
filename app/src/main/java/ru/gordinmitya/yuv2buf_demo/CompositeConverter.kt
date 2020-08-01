@@ -9,7 +9,7 @@ import androidx.lifecycle.LifecycleObserver
 class ConversionResult(val method: String, val image: Bitmap, val time: Long)
 interface ImageConverter {
     fun getName(): String
-    fun convert(image: ImageProxy): Bitmap
+    fun convert(image: ImageProxy): Pair<Bitmap, Long>
 }
 
 class CompositeConverter(
@@ -22,10 +22,8 @@ class CompositeConverter(
     override fun analyze(image: ImageProxy) {
         val results = functions.map { converter ->
             image.planes.forEach { plane -> plane.buffer.rewind() }
-            val start = System.currentTimeMillis()
-            val bitmap = converter.convert(image)
-            val end = System.currentTimeMillis()
-            ConversionResult(converter.getName(), bitmap, end - start)
+            val (bitmap, time) = converter.convert(image)
+            ConversionResult(converter.getName(), bitmap, time)
         }
         handler.post {
             val size =
