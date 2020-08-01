@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
 
         analysisExecutor = Executors.newSingleThreadExecutor()
         val converters = arrayOf(
+            MNNConverter(this),
             OpenCVConverter(),
             RenderScriptConverter(this)
         )

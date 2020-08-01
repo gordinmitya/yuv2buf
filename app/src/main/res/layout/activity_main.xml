@@ -20,13 +20,13 @@
 
     <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom">
 
         <LinearLayout
             android:id="@+id/list_results"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal" />
     </HorizontalScrollView>
 </FrameLayout>
