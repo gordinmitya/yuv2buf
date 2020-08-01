@@ -14,9 +14,10 @@ The whole library is a single file, you can just copy [Yuv.java](yuv2buf/src/mai
 
 **Alternatives**
 
-1. Switch back to CameraApi 1 [(some trade offs)](https://github.com/tensorflow/tensorflow/issues/22620);
+1. (For OpenCV users) Copy private method from OpenCV camera implementation: [JavaCamera2View, Mat rgba()](https://github.com/opencv/opencv/blob/master/modules/java/generator/android-21/java/org/opencv/android/JavaCamera2View.java#L344).
 2. Capture image from camera directly to [RenderScript Allocation.getSurface()](https://developer.android.com/reference/android/renderscript/Allocation#getSurface());
-3. Manipulate pixels manually as it has done in TFLite demo [ImageUtils](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/android/src/org/tensorflow/demo/env/ImageUtils.java#L161).
+3. Switch back to CameraApi 1 [(some trade offs)](https://github.com/tensorflow/tensorflow/issues/22620);
+4. Manipulate pixels manually as it has done in TFLite demo [ImageUtils](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/android/src/org/tensorflow/demo/env/ImageUtils.java#L161).
     However, even with [C++ implementation](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/android/jni/yuv2rgb.cc#L61)
     it's ridiculously slow. ~50ms for image about 1280x720 on Snapdragon 855;
 
@@ -29,5 +30,4 @@ The whole library is a single file, you can just copy [Yuv.java](yuv2buf/src/mai
 - [x] add OpenCV example;
 - [ ] publish to jcenter;
 - [ ] add MNN example;
-- [ ] add TFLite example;
-- [ ] support format conversions.
+- [ ] add TFLite example.
