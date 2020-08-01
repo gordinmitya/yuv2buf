@@ -35,9 +35,18 @@ fun convert(image: ImageProxy): Pair<Bitmap, Long> {
 
 **Converters** 
 
-1. [OpenCVConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/OpenCVConverter.kt) - the fastest. If your goal is to get Mat consider this method from [OpenCV](https://github.com/opencv/opencv/blob/master/modules/java/generator/android-21/java/org/opencv/android/JavaCamera2View.java#L344).
+1. [OpenCVConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/OpenCVConverter.kt) - the fastest. If your goal is to get Mat you may consider this method from [OpenCV](https://github.com/opencv/opencv/blob/master/modules/java/generator/android-21/java/org/opencv/android/JavaCamera2View.java#L344).
 2. [RenderScriptConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/RenderScriptConverter.kt)  - built-in, no additional libraries required.
 3. [MNNConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/MNNConverter.kt) - if your goal is futher processing with neural network.
+
+**Benchmark**
+
+<img width="320" src="https://user-images.githubusercontent.com/9286092/89111383-cb88ab00-d45d-11ea-931f-c484235f8ebb.jpg" />
+
+Snapdragon 855 (Xiaomi Mi 9T Pro). Image resolution 480x640.
+| MNN | OpenCV | RenderScript |
+| :-: |:-:| :-:|
+| ~7ms | ~1ms | ~2ms |
 
 **Alternatives**
 
