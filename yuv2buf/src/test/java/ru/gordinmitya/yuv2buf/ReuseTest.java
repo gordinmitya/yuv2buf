@@ -12,7 +12,7 @@ public class ReuseTest {
     @Test
     public void test_reuse() {
         final int width = 10, height = 10;
-        Yuv.ImageWrapper image = YuvCommon.make(Yuv.Type.YUV_420, width, height, width);
+        Yuv.ImageWrapper image = YuvCommon.make(Yuv.Type.YUV_I420, width, height, width);
         int size = width * height * 3 / 2;
         ByteBuffer correctReuse;
         ByteBuffer result;
@@ -32,7 +32,7 @@ public class ReuseTest {
     @Test
     public void test_makesNew() {
         final int width = 10, height = 10;
-        Yuv.ImageWrapper image = YuvCommon.make(Yuv.Type.YUV_420, width, height, width);
+        Yuv.ImageWrapper image = YuvCommon.make(Yuv.Type.YUV_I420, width, height, width);
         int size = width * height * 3 / 2;
         ByteBuffer incorrectReuse;
         ByteBuffer result;

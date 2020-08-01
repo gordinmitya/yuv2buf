@@ -42,7 +42,7 @@ public class YuvCommonTest {
 
     @Test
     public void test_ImageGeneration_YUV420() {
-        Yuv.ImageWrapper image = make(Yuv.Type.YUV_420, width, height, rowStride);
+        Yuv.ImageWrapper image = make(Yuv.Type.YUV_I420, width, height, rowStride);
 
         assertPlaneParams(image.y, width, height, rowStride, 1);
         assertCompactPlane(image.y, Y);

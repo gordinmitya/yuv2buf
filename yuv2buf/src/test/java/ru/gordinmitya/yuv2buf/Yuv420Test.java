@@ -33,11 +33,11 @@ public class Yuv420Test {
 
     @Test
     public void check() {
-        Yuv.ImageWrapper image = YuvCommon.make(Yuv.Type.YUV_420, width, height, rowStride);
+        Yuv.ImageWrapper image = YuvCommon.make(Yuv.Type.YUV_I420, width, height, rowStride);
         Yuv.Converted converted = Yuv.toBuffer(image, null);
         ByteBuffer buffer = converted.buffer;
 
-        assertEquals(Yuv.Type.YUV_420, converted.type);
+        assertEquals(Yuv.Type.YUV_I420, converted.type);
         assertEquals(0, buffer.position());
 
         int sizeY = width * height;

@@ -35,7 +35,7 @@ class YuvCommon {
         assert rowStride >= width;
         Yuv.PlaneWrapper y = makeCompact(Y, width, height, rowStride);
         Yuv.PlaneWrapper u, v;
-        if (Yuv.Type.YUV_420.equals(type)) {
+        if (Yuv.Type.YUV_I420.equals(type)) {
             int stride = rowStride == width ? width / 2 : rowStride;
             u = makeCompact(U, width / 2, height / 2, stride);
             v = makeCompact(V, width / 2, height / 2, stride);

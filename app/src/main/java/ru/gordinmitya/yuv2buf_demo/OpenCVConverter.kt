@@ -21,7 +21,7 @@ class OpenCVConverter() : ImageConverter {
         reuseBuffer = converted.buffer
 
         val format = when (converted.type) {
-            Yuv.Type.YUV_420 -> Imgproc.COLOR_YUV2RGBA_I420
+            Yuv.Type.YUV_I420 -> Imgproc.COLOR_YUV2RGBA_I420
             Yuv.Type.YUV_NV21 -> Imgproc.COLOR_YUV2RGBA_NV21
         }
         val yuvMat =

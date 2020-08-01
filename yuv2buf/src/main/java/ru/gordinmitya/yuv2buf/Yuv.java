@@ -8,12 +8,39 @@ import androidx.camera.core.ImageProxy;
 import java.nio.ByteBuffer;
 
 abstract public class Yuv {
-    /*
-        Public types.
-     */
+/*
+   Intro to YUV image formats:
+    YUV_420_888 - is a generic format that can be represented as I420, YV12, NV21, and NV12.
+    420 means that for each 4 luminosity pixels we have 2 chroma pixels: U and V.
+
+    * I420 format represents an image as Y plane followed by U then followed by V plane
+        without chroma channels interleaving.
+        For example:
+        Y Y Y Y
+        Y Y Y Y
+        U U V V
+
+    * NV21 format represents an image as Y plane followed by V and U interleaved. First V then U.
+        For example:
+        Y Y Y Y
+        Y Y Y Y
+        V U V U
+
+    * YV12 and NV12 are the same as previous formats but with swapped order of V and U. (U then V)
+
+    It's guaranteed that image.getPlanes() always returns planes in order Y U V for YUV_420_888.
+    https://developer.android.com/reference/android/graphics/ImageFormat#YUV_420_888
+
+    Because I420 and NV21 are more widely supported (RenderScript, OpenCV, MNN)
+    the conversion is done into these formats.
+
+    More about each format: https://www.fourcc.org/yuv.php
+*/
+
+
     public enum Type {
         YUV_NV21(ImageFormat.NV21),
-        YUV_420(ImageFormat.YUV_420_888);
+        YUV_I420(ImageFormat.YUV_420_888);
 
         public final int format;
 
@@ -58,7 +85,13 @@ abstract public class Yuv {
     }
 
     private static PlaneWrapper wrap(int width, int height, Image.Plane plane) {
-        return new PlaneWrapper(width, height, plane.getBuffer(), plane.getRowStride(), plane.getPixelStride());
+        return new PlaneWrapper(
+                width,
+                height,
+                plane.getBuffer(),
+                plane.getRowStride(),
+                plane.getPixelStride()
+        );
     }
 
     /*
@@ -87,7 +120,13 @@ abstract public class Yuv {
     }
 
     private static PlaneWrapper wrap(int width, int height, ImageProxy.PlaneProxy plane) {
-        return new PlaneWrapper(width, height, plane.getBuffer(), plane.getRowStride(), plane.getPixelStride());
+        return new PlaneWrapper(
+                width,
+                height,
+                plane.getBuffer(),
+                plane.getRowStride(),
+                plane.getPixelStride()
+        );
     }
     // End of CameraX api.
 
@@ -100,8 +139,9 @@ abstract public class Yuv {
      @see #ImageWrapper.checkFormat()
      */
     static Type detectType(ImageWrapper image) {
+
         if (image.u.pixelStride == 1)
-            return Type.YUV_420;
+            return Type.YUV_I420;
         else
             return Type.YUV_NV21;
     }
@@ -140,7 +180,7 @@ abstract public class Yuv {
             output.put(image.y.buffer);
         }
 
-        if (type.equals(Type.YUV_420)) {
+        if (type.equals(Type.YUV_I420)) {
             if (image.u.rowStride > image.u.width) {
                 removePaddingCompact(image.u, output, sizeLuma);
                 removePaddingCompact(image.v, output, sizeLuma + sizeChroma);
@@ -165,7 +205,7 @@ abstract public class Yuv {
 
     private static void removePaddingCompact(PlaneWrapper plane, ByteBuffer dst, int offset) {
         if (plane.pixelStride != 1)
-            throw new IllegalArgumentException("removePaddingCompact must be used with pixelStride == 1");
+            throw new IllegalArgumentException("use removePaddingCompact with pixelStride == 1");
 
         ByteBuffer src = plane.buffer;
         int rowStride = plane.rowStride;
@@ -179,7 +219,7 @@ abstract public class Yuv {
 
     private static void removePaddingNotCompact(ImageWrapper image, ByteBuffer dst, int offset) {
         if (image.u.pixelStride != 2)
-            throw new IllegalArgumentException("removePaddingNotCompact must be used with pixelStride == 2");
+            throw new IllegalArgumentException("use removePaddingNotCompact pixelStride == 2");
 
         int width = image.u.width;
         int height = image.u.height;
@@ -200,24 +240,6 @@ abstract public class Yuv {
         duplicate.limit(start + size);
         return duplicate.slice();
     }
-
-    // TODO support format conversions
-    /* private static void fromNV21(
-            PlaneWrapper plane,
-            byte[] src,
-            int srcOffset,
-            byte[] dst,
-            int dstOffset
-    ) {
-        int pixelStride = plane.pixelStride;
-        int rowStride = plane.rowStride;
-        int dstPos = dstOffset;
-        for (int row = 0; row < plane.height; row++) {
-            for (int col = 0; col < plane.width; col++) {
-                dst[dstPos++] = src[row * rowStride + col * pixelStride + srcOffset];
-            }
-        }
-    } */
 
     static class ImageWrapper {
         final int width, height;
