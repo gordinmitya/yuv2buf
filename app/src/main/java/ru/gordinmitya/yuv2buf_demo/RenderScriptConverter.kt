@@ -12,7 +12,7 @@ import java.nio.ByteBuffer
 
 class RenderScriptConverter(context: Context) : ImageConverter {
     val rs = RenderScript.create(context)
-    val intrinsic = ScriptIntrinsicYuvToRGB.create(rs, Element.RGBA_8888(rs))
+    val intrinsic = ScriptIntrinsicYuvToRGB.create(rs, Element.RGB_888(rs))
 
     private var reuseBuffer: ByteBuffer? = null
 

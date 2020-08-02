@@ -23,8 +23,8 @@ class OpenCVConverter() : ImageConverter {
         reuseBuffer = converted.buffer
 
         val format = when (converted.type) {
-            Yuv.Type.YUV_I420 -> Imgproc.COLOR_YUV2RGBA_I420
-            Yuv.Type.YUV_NV21 -> Imgproc.COLOR_YUV2RGBA_NV21
+            Yuv.Type.YUV_I420 -> Imgproc.COLOR_YUV2RGB_I420
+            Yuv.Type.YUV_NV21 -> Imgproc.COLOR_YUV2RGB_NV21
         }
         val yuvMat =
             Mat(image.height + image.height / 2, image.width, CvType.CV_8UC1, converted.buffer)
@@ -39,6 +39,7 @@ class OpenCVConverter() : ImageConverter {
 
         val bitmap = Bitmap.createBitmap(rgbMat.cols(), rgbMat.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(rgbMat, bitmap)
+
 
         // don't forget to call image.close() here
         // but as long as we have many converters
