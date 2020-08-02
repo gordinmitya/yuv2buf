@@ -28,6 +28,8 @@ abstract public class Yuv {
 
     * YV12 and NV12 are the same as previous formats but with swapped order of V and U. (U then V)
 
+    Visualization of these 4 formats: https://user-images.githubusercontent.com/9286092/89119601-4f6f8100-d4b8-11ea-9a51-2765f7e513c2.jpg
+
     It's guaranteed that image.getPlanes() always returns planes in order Y U V for YUV_420_888.
     https://developer.android.com/reference/android/graphics/ImageFormat#YUV_420_888
 

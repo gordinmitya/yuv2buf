@@ -8,7 +8,7 @@ When you're attempting to get an `Image` from `ImageReader` or `ImageAnalysis.An
 
 **Solution**:
 
-This library carefully merges 3 buffers into one with respect to all strides. As a result, you receive YUV type (`NV21` or `I420`) and `ByteBuffer` to pass into OpenCV or a neural network framework.
+This library carefully merges 3 buffers into one with respect to all strides. As a result, you receive [YUV type](https://user-images.githubusercontent.com/9286092/89119601-4f6f8100-d4b8-11ea-9a51-2765f7e513c2.jpg) (`NV21` or `I420`) and `ByteBuffer` to pass into OpenCV or a neural network framework.
 
 The whole library is a single file, you can just copy [Yuv.java](yuv2buf/src/main/java/ru/gordinmitya/yuv2buf/Yuv.java) into your project.
 
