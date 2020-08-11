@@ -46,7 +46,7 @@ class OpenCVRoteterter() : ImageConverter {
         }
         val tRotateEnd = System.currentTimeMillis()
 
-        val rgbMat = Mat(image.height, image.width, CvType.CV_8UC4)
+        val rgbMat = Mat(image.height, image.width, CvType.CV_8UC3)
 
         Imgproc.cvtColorTwoPlane(yMat, uvMat, rgbMat, format)
 

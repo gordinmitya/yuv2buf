@@ -28,7 +28,7 @@ class OpenCVConverter() : ImageConverter {
         }
         val yuvMat =
             Mat(image.height + image.height / 2, image.width, CvType.CV_8UC1, converted.buffer)
-        val rgbMat = Mat(image.height, image.width, CvType.CV_8UC4)
+        val rgbMat = Mat(image.height, image.width, CvType.CV_8UC3)
         Imgproc.cvtColor(yuvMat, rgbMat, format)
 
         val tokColor = System.currentTimeMillis()
