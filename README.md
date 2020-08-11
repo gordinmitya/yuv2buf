@@ -35,18 +35,22 @@ fun convert(image: ImageProxy): Pair<Bitmap, Long> {
 
 **Converters** 
 
-1. [OpenCVConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/OpenCVConverter.kt) - the fastest. If your goal is to get Mat you may consider this method from [OpenCV](https://github.com/opencv/opencv/blob/master/modules/java/generator/android-21/java/org/opencv/android/JavaCamera2View.java#L344).
-2. [RenderScriptConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/RenderScriptConverter.kt)  - built-in, no additional libraries required.
-3. [MNNConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/MNNConverter.kt) - if your goal is futher processing with neural network.
+1. [OpenCVRoteterter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/OpenCVRoteterter.kt) - preform rotation on yuv image and then converts color. **The fastest in total time**.
+2. [OpenCVConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/OpenCVConverter.kt) - the fastest color conversion without rotation. Rotation of a rgb image is slightly harder. 
+3. [RenderScriptConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/RenderScriptConverter.kt)  - built-in, no additional libraries required. Uses Bitmap for rotation.
+4. [MNNConverter.kt](app/src/main/java/ru/gordinmitya/yuv2buf_demo/MNNConverter.kt) - if your goal is futher processing with neural network. Conversion and rotation performed in single operation.
+
+PS: If your goal is to get Mat you may consider this method from [OpenCV](https://github.com/opencv/opencv/blob/master/modules/java/generator/android-21/java/org/opencv/android/JavaCamera2View.java#L344).
 
 **Benchmark**
 
-<img width="320" src="https://user-images.githubusercontent.com/9286092/89111383-cb88ab00-d45d-11ea-931f-c484235f8ebb.jpg" />
+<img width="320" src="https://user-images.githubusercontent.com/9286092/89957124-537d6a80-dc3f-11ea-99d5-0e22301db688.jpg" />
 
 Snapdragon 855 (Xiaomi Mi 9T Pro). Image resolution 480x640.
-| MNN | OpenCV | RenderScript |
-| :-: |:-:| :-:|
-| ~7ms | ~1ms | ~2ms |
+|        | OpenCV (YUV rotate)  | OpenCV (RGB rotate) | RenderScript | MNN   | 
+| :-     | :-:                  |       :-:           | :-:          | :-:   |
+| color  | ~1ms                 | ~1.6ms              | ~2.2ms       | ~21ms |
+| rotate | ~3.5ms               | ~2.8ms              | ~16.3ms      | NA (included in color)    |
 
 **Alternatives**
 
