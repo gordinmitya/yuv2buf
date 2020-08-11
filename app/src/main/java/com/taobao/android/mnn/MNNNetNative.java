@@ -19,9 +19,10 @@ public class MNNNetNative {
 
     static {
         System.loadLibrary("MNN");
-        loadGpuLibrary("MNN_Vulkan");
-        loadGpuLibrary("MNN_OpenCL");
-        loadGpuLibrary("MNN_GL");
+        // don't need them in this demo
+//        loadGpuLibrary("MNN_Vulkan");
+//        loadGpuLibrary("MNN_OpenCL");
+//        loadGpuLibrary("MNN_GL");
         System.loadLibrary("mnncore");
     }
 

@@ -6,10 +6,10 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.LifecycleObserver
 
-class ConversionResult(val method: String, val image: Bitmap, val time: Long)
+class ConversionResult(val method: String, val image: Bitmap, val colorTime: Long, val rotateTime: Long)
 interface ImageConverter {
     fun getName(): String
-    fun convert(image: ImageProxy): Pair<Bitmap, Long>
+    fun convert(image: ImageProxy): ConversionResult
 }
 
 class CompositeConverter(
@@ -22,8 +22,7 @@ class CompositeConverter(
     override fun analyze(image: ImageProxy) {
         val results = functions.map { converter ->
             image.planes.forEach { plane -> plane.buffer.rewind() }
-            val (bitmap, time) = converter.convert(image)
-            ConversionResult(converter.getName(), bitmap, time)
+            converter.convert(image)
         }
         handler.post {
             val size =

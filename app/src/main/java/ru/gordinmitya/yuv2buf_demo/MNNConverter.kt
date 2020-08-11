@@ -34,7 +34,7 @@ class MNNConverter(context: Context) : ImageConverter {
         outputTensor = session.getOutput(null)
     }
 
-    override fun convert(image: ImageProxy): Pair<Bitmap, Long> {
+    override fun convert(image: ImageProxy): ConversionResult {
         val tik = System.currentTimeMillis()
 
         val converted = Yuv.toBuffer(image, reuseBuffer)
@@ -87,6 +87,6 @@ class MNNConverter(context: Context) : ImageConverter {
         // we'll do it in CompositeConverter
         // image.close()
 
-        return bitmap to tok - tik
+        return ConversionResult(getName(), bitmap, tok - tik, 0)
     }
 }

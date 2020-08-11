@@ -12,11 +12,11 @@ import java.nio.ByteBuffer
 
 
 class OpenCVConverter() : ImageConverter {
-    override fun getName(): String = "OpenCV"
+    override fun getName(): String = "OpenCV (RGB rotate)"
 
     private var reuseBuffer: ByteBuffer? = null
 
-    override fun convert(image: ImageProxy): Pair<Bitmap, Long> {
+    override fun convert(image: ImageProxy): ConversionResult {
         val tik = System.currentTimeMillis()
 
         val converted = Yuv.toBuffer(image, reuseBuffer)
@@ -31,11 +31,13 @@ class OpenCVConverter() : ImageConverter {
         val rgbMat = Mat(image.height, image.width, CvType.CV_8UC4)
         Imgproc.cvtColor(yuvMat, rgbMat, format)
 
-        val tok = System.currentTimeMillis()
+        val tokColor = System.currentTimeMillis()
 
         if (image.imageInfo.rotationDegrees != 0) {
             Core.rotate(rgbMat, rgbMat, image.imageInfo.rotationDegrees / 90 - 1)
         }
+
+        val tokRotate = System.currentTimeMillis()
 
         val bitmap = Bitmap.createBitmap(rgbMat.cols(), rgbMat.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(rgbMat, bitmap)
@@ -46,6 +48,6 @@ class OpenCVConverter() : ImageConverter {
         // we'll do it in CompositeConverter
         // image.close()
 
-        return bitmap to tok - tik
+        return ConversionResult(getName(), bitmap, tokColor - tik, tokRotate - tokColor)
     }
 }

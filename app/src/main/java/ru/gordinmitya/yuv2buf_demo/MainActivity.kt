@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
+import android.util.Size
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
     private lateinit var analysisExecutor: ExecutorService
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var imageAnalyzer: CompositeConverter
-    private lateinit var resultAverages: Array<MovingAverage>
+    private lateinit var resultAverages: Array<Pair<MovingAverage, MovingAverage>>
     private lateinit var resultViews: Array<View>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,11 +48,14 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
 
         analysisExecutor = Executors.newSingleThreadExecutor()
         val converters = arrayOf(
-            MNNConverter(this),
             OpenCVConverter(),
-            RenderScriptConverter(this)
+            OpenCVRoteterter(),
+            RenderScriptConverter(this),
+            MNNConverter(this)
         )
-        resultAverages = Array(converters.size) { MovingAverage(movingAverageSize) }
+        resultAverages = Array(converters.size) {
+            MovingAverage(movingAverageSize) to MovingAverage(movingAverageSize)
+        }
         resultViews = Array(converters.size) {
             return@Array layoutInflater.inflate(R.layout.item_converted, list_results, false)
         }
@@ -69,15 +73,22 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
 
     @SuppressLint("SetTextI18n")
     override fun onAnalyzed(size: Pair<Int, Int>, results: List<ConversionResult>) {
+        fun Double.format() = String.format("%.2f", this)
+
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
         text_size.text = "${size.first}x${size.second}"
         results.forEachIndexed { index, result ->
             val average = resultAverages[index]
-            average.add(result.time)
+            average.first.add(result.colorTime)
+            average.second.add(result.rotateTime)
             resultViews[index].let {
                 it.image.setImageBitmap(result.image)
                 it.text_name.text = result.method
-                it.text_time.text = "${result.time}ms\n$average"
+                it.text_time.text = "clr ${result.colorTime}ms\n" +
+                        "avg clr ${average.first.avg().format()}\n" +
+                        "rot ${result.rotateTime}ms\n" +
+                        "avg rot ${average.second.avg().format()}\n" +
+                        "total ${(average.first.avg() + average.second.avg()).format()}"
             }
         }
     }
@@ -89,6 +100,7 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
             .requireLensFacing(CameraSelector.LENS_FACING_BACK)
             .build()
         val analysis = ImageAnalysis.Builder()
+            .setTargetResolution(Size(720, 1280))
             .setTargetRotation(preview_view.display.rotation)
             .build()
             .also {
