@@ -83,6 +83,6 @@ class RenderScriptConverter(context: Context) : ImageConverter {
         // we'll do it in CompositeConverter
         // image.close()
 
-        return ConversionResult(getName(), bitmap, tokColor - tik, tokRotate - tokColor)
+        return ConversionResult.Success(getName(), bitmap, tokColor - tik, tokRotate - tokColor)
     }
 }

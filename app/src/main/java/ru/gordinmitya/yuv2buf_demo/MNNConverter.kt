@@ -3,7 +3,6 @@ package ru.gordinmitya.yuv2buf_demo
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import android.util.Log
 import android.util.Size
 import androidx.camera.core.ImageProxy
 import com.taobao.android.mnn.MNNForwardType
@@ -87,6 +86,6 @@ class MNNConverter(context: Context) : ImageConverter {
         // we'll do it in CompositeConverter
         // image.close()
 
-        return ConversionResult(getName(), bitmap, tok - tik, 0)
+        return ConversionResult.Success(getName(), bitmap, tok - tik, 0)
     }
 }
