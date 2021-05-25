@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.ImageFormat
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -19,6 +20,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
@@ -30,11 +32,11 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
-    val movingAverageSize = 64
+    private val movingAverageSize = 64
 
     private lateinit var analysisExecutor: ExecutorService
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
-    private lateinit var imageAnalyzer: CompositeConverter
+    private lateinit var compositeConverter: CompositeConverter
     private lateinit var resultAverages: Array<Pair<MovingAverage, MovingAverage>>
     private lateinit var resultViews: Array<View>
 
@@ -60,7 +62,7 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
             return@Array layoutInflater.inflate(R.layout.item_converted, list_results, false)
         }
         resultViews.forEach { list_results.addView(it) }
-        imageAnalyzer = CompositeConverter(this, Handler(), *converters)
+        compositeConverter = CompositeConverter(this, Handler(), *converters)
     }
 
     private fun initCamera() {
@@ -72,25 +74,50 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onAnalyzed(size: Pair<Int, Int>, results: List<ConversionResult>) {
-        fun Double.format() = String.format("%.2f", this)
-
+    override fun onAnalyzed(results: List<ConversionResult>) {
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
-        text_size.text = "${size.first}x${size.second}"
         results.forEachIndexed { index, result ->
-            val average = resultAverages[index]
-            average.first.add(result.colorTime)
-            average.second.add(result.rotateTime)
-            resultViews[index].let {
-                it.image.setImageBitmap(result.image)
-                it.text_name.text = result.method
-                it.text_time.text = "clr ${result.colorTime}ms\n" +
-                        "avg clr ${average.first.avg().format()}\n" +
-                        "rot ${result.rotateTime}ms\n" +
-                        "avg rot ${average.second.avg().format()}\n" +
-                        "total ${(average.first.avg() + average.second.avg()).format()}"
+            when (result) {
+                is ConversionResult.Success -> updateSuccess(index, result)
+                is ConversionResult.Failed -> updateFailed(index, result)
             }
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateSuccess(index: Int, result: ConversionResult.Success) {
+        fun Double.format() = String.format("%.2f", this)
+
+        val average = resultAverages[index]
+        average.first.add(result.colorTime)
+        average.second.add(result.rotateTime)
+        resultViews[index].let {
+            it.image.setImageBitmap(result.image)
+            it.text_name.text = result.method
+            it.text_time.text = "clr ${result.colorTime}ms\n" +
+                    "avg clr ${average.first.avg().format()}\n" +
+                    "rot ${result.rotateTime}ms\n" +
+                    "avg rot ${average.second.avg().format()}\n" +
+                    "total ${(average.first.avg() + average.second.avg()).format()}"
+        }
+    }
+
+    private fun updateFailed(index: Int, result: ConversionResult.Failed) {
+        resultViews[index].let {
+            it.image.setImageBitmap(null)
+            it.text_name.text = result.method
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateInfo(image: ImageProxy) = text_frame_info.post {
+        val imageFormat = IMAGE_FORMATS.getOrElse(image.format, { "unkonow format" })
+        text_frame_info.text = "${image.width}x${image.height} $imageFormat\n" +
+                "rotation ${image.imageInfo.rotationDegrees}\n" +
+                "cropRect ${image.cropRect.toShortString()}\n" +
+                image.planes.mapIndexed { index, plane ->
+                    "plane $index: rowStride=${plane.rowStride} pixelStride=${plane.pixelStride}\n"
+                }.joinToString("")
     }
 
     private fun bindCameraX(cameraProvider: ProcessCameraProvider) {
@@ -104,10 +131,13 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
             .setTargetRotation(preview_view.display.rotation)
             .build()
             .also {
-                it.setAnalyzer(analysisExecutor, imageAnalyzer)
+                it.setAnalyzer(analysisExecutor, ImageAnalysis.Analyzer { image ->
+                    updateInfo(image)
+                    compositeConverter.analyze(image)
+                })
             }
         val camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, analysis)
-        preview.setSurfaceProvider(preview_view.createSurfaceProvider(camera.cameraInfo))
+        preview.setSurfaceProvider(preview_view.surfaceProvider)
     }
 
     override fun onDestroy() {
@@ -125,7 +155,6 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
             return
         }
         if (!allPermissionsGranted(this)) {
-            // TODO message
             Toast.makeText(this, "As you wish ¯\\_(ツ)_/¯", Toast.LENGTH_LONG).show()
             finish()
             return
@@ -177,4 +206,23 @@ class MainActivity : AppCompatActivity(), CompositeConverter.Listener {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
     }
+}
+
+private val IMAGE_FORMATS: Map<Int, String> by lazy {
+    val map = mutableMapOf(
+        ImageFormat.JPEG to "JPEG",
+        ImageFormat.YUV_420_888 to "YUV_420_888",
+        ImageFormat.RAW_SENSOR to "RAW_SENSOR",
+        ImageFormat.HEIC to "HEIC"
+    )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        map[ImageFormat.YUV_422_888] = "YUV_422_888"
+        map[ImageFormat.YUV_444_888] = "YUV_444_888"
+        map[ImageFormat.FLEX_RGB_888] = "FLEX_RGB_888"
+        map[ImageFormat.FLEX_RGBA_8888] = "FLEX_RGBA_8888"
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        ImageFormat.RAW_PRIVATE to "RAW_PRIVATE"
+    }
+    map
 }

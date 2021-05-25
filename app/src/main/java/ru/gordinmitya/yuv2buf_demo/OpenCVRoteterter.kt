@@ -62,7 +62,7 @@ class OpenCVRoteterter() : ImageConverter {
 
         val colorTime = tRotateStart - tik + tok - tRotateEnd
 
-        return ConversionResult(getName(), bitmap, colorTime, tRotateEnd - tRotateStart)
+        return ConversionResult.Success(getName(), bitmap, colorTime, tRotateEnd - tRotateStart)
     }
 
     private fun ByteBuffer.clipBuffer(

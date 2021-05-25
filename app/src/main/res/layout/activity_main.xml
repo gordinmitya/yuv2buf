@@ -11,12 +11,12 @@
         android:layout_height="match_parent" />
 
     <TextView
-        android:id="@+id/text_size"
+        android:id="@+id/text_frame_info"
         style="@style/TextOverlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        tools:text="600x800" />
+        android:layout_gravity="start|top"
+        tools:text="Buffer 0: rowStride=1280 pixelStride=1" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
