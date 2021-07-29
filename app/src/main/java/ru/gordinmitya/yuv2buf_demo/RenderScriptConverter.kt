@@ -31,17 +31,13 @@ class RenderScriptConverter(context: Context) : ImageConverter {
         if (input == null
             || input!!.type.x != image.width
             || input!!.type.y != image.height
-            || input!!.type.yuv != converted.type.format
+            || input!!.type.yuv != converted.type
             || bytes.size != converted.buffer.capacity()
         ) {
-            val yuvFormat = when (converted.type) {
-                Yuv.Type.YUV_I420 -> ImageFormat.YUV_420_888
-                Yuv.Type.YUV_NV21 -> ImageFormat.NV21
-            }
             val yuvType: Type.Builder = Type.Builder(rs, Element.U8(rs))
                 .setX(image.width)
                 .setY(image.height)
-                .setYuvFormat(yuvFormat)
+                .setYuvFormat(converted.type)
             input = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT)
             bytes = ByteArray(converted.buffer.capacity())
             val rgbaType: Type.Builder = Type.Builder(rs, Element.RGBA_8888(rs))

@@ -2,6 +2,7 @@ package ru.gordinmitya.yuv2buf_demo
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.ImageFormat
 import android.graphics.Matrix
 import android.util.Size
 import androidx.camera.core.ImageProxy
@@ -45,8 +46,9 @@ class MNNConverter(context: Context) : ImageConverter {
         }
 
         val format = when (converted.type) {
-            Yuv.Type.YUV_I420 -> MNNImageProcess.Format.YUV_420
-            Yuv.Type.YUV_NV21 -> MNNImageProcess.Format.YUV_NV21
+            ImageFormat.YUV_420_888 -> MNNImageProcess.Format.YUV_420
+            ImageFormat.NV21 -> MNNImageProcess.Format.YUV_NV21
+            else -> throw IllegalArgumentException()
         }
 
         val config = MNNImageProcess.Config().also {

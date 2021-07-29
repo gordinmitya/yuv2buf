@@ -10,6 +10,8 @@ When you're attempting to get an `Image` from `ImageReader` or `ImageAnalysis.An
 
 This library carefully merges 3 buffers into one with respect to all strides. As a result, you receive [YUV type](https://user-images.githubusercontent.com/9286092/89119601-4f6f8100-d4b8-11ea-9a51-2765f7e513c2.jpg) (`NV21` or `I420`) and `ByteBuffer` to pass into OpenCV or a neural network framework.
 
+The solution was tested with CameraX, CameraApi 2 and MediaCodec (for video files).
+
 The whole library is a single file, you can just copy [Yuv.java](yuv2buf/src/main/java/ru/gordinmitya/yuv2buf/Yuv.java) into your project.
 
 **Usage**
@@ -19,17 +21,18 @@ private var reuseBuffer: ByteBuffer? = null
 
 fun convert(image: ImageProxy): Pair<Bitmap, Long> {
 
-    val converted = Yuv.toBuffer(image)
+    // val converted = Yuv.toBuffer(image)
     // OR pass existing DirectBuffer for reuse
     val converted = Yuv.toBuffer(image, reuseBuffer)
     reuseBuffer = converted.buffer
 
     val format = when (converted.type) {
-        Yuv.Type.YUV_I420 -> Imgproc.COLOR_YUV2RGBA_I420
-        Yuv.Type.YUV_NV21 -> Imgproc.COLOR_YUV2RGBA_NV21
+        ImageFormat.YUV_420_888 -> Imgproc.COLOR_YUV2RGB_I420
+        ImageFormat.NV21 -> Imgproc.COLOR_YUV2RGB_NV21
+        else -> throw IllegalArgumentException()
     }
 
-    // process with one of converters
+    // process converted.buffer ByteBuffer with one of converters
 }
 ```
 
@@ -71,5 +74,5 @@ Snapdragon 855 (Xiaomi Mi 9T Pro). Image resolution 480x640.
 - [x] add OpenCV example;
 - [x] add MNN example;
 - [ ] publish to GooglePlay;
-- [ ] publish to jcenter;
+- [ ] publish to mavenCentral();
 - [ ] add TFLite example.

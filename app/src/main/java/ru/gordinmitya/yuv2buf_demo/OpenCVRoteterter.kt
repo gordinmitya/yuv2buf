@@ -1,6 +1,7 @@
 package ru.gordinmitya.yuv2buf_demo
 
 import android.graphics.Bitmap
+import android.graphics.ImageFormat
 import androidx.camera.core.ImageProxy
 import org.opencv.android.Utils
 import org.opencv.core.Core
@@ -26,8 +27,9 @@ class OpenCVRoteterter() : ImageConverter {
         reuseBuffer = converted.buffer
 
         val format = when (converted.type) {
-            Yuv.Type.YUV_I420 -> Imgproc.COLOR_YUV2RGB_I420
-            Yuv.Type.YUV_NV21 -> Imgproc.COLOR_YUV2RGB_NV21
+            ImageFormat.YUV_420_888 -> Imgproc.COLOR_YUV2RGB_I420
+            ImageFormat.NV21 -> Imgproc.COLOR_YUV2RGB_NV21
+            else -> throw IllegalArgumentException()
         }
 
         val ySize = image.width * image.height

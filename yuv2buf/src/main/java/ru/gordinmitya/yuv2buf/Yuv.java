@@ -3,13 +3,19 @@ package ru.gordinmitya.yuv2buf;
 import android.graphics.ImageFormat;
 import android.media.Image;
 
+import androidx.annotation.IntDef;
 import androidx.camera.core.ImageProxy;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
+
 
 abstract public class Yuv {
 /*
-   Intro to YUV image formats:
+    This file is part of https://github.com/gordinmitya/yuv2buf
+
+    Intro to YUV image formats:
     YUV_420_888 - is a generic format that can be represented as I420, YV12, NV21, and NV12.
     420 means that for each 4 luminosity pixels we have 2 chroma pixels: U and V.
 
@@ -28,7 +34,8 @@ abstract public class Yuv {
 
     * YV12 and NV12 are the same as previous formats but with swapped order of V and U. (U then V)
 
-    Visualization of these 4 formats: https://user-images.githubusercontent.com/9286092/89119601-4f6f8100-d4b8-11ea-9a51-2765f7e513c2.jpg
+    Visualization of these 4 formats:
+    https://user-images.githubusercontent.com/9286092/89119601-4f6f8100-d4b8-11ea-9a51-2765f7e513c2.jpg
 
     It's guaranteed that image.getPlanes() always returns planes in order Y U V for YUV_420_888.
     https://developer.android.com/reference/android/graphics/ImageFormat#YUV_420_888
@@ -39,23 +46,17 @@ abstract public class Yuv {
     More about each format: https://www.fourcc.org/yuv.php
 */
 
-
-    public enum Type {
-        YUV_NV21(ImageFormat.NV21),
-        YUV_I420(ImageFormat.YUV_420_888);
-
-        public final int format;
-
-        Type(int format) {
-            this.format = format;
-        }
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({ImageFormat.NV21, ImageFormat.YUV_420_888})
+    public @interface YuvType {
     }
 
     public static class Converted {
-        public final Type type;
+        @YuvType
+        public final int type;
         public final ByteBuffer buffer;
 
-        private Converted(Type type, ByteBuffer buffer) {
+        private Converted(@YuvType int type, ByteBuffer buffer) {
             this.type = type;
             this.buffer = buffer;
         }
@@ -64,7 +65,8 @@ abstract public class Yuv {
     /*
         Api.
      */
-    public static Type detectType(Image image) {
+    @YuvType
+    public static int detectType(Image image) {
         return detectType(wrap(image));
     }
 
@@ -99,7 +101,8 @@ abstract public class Yuv {
     /*
         CameraX api. If you don't need it – just comment lines below.
      */
-    public static Type detectType(ImageProxy image) {
+    @YuvType
+    public static int detectType(ImageProxy image) {
         return detectType(wrap(image));
     }
 
@@ -140,16 +143,17 @@ abstract public class Yuv {
      other pixelStride are not possible
      @see #ImageWrapper.checkFormat()
      */
-    static Type detectType(ImageWrapper image) {
-
-        if (image.u.pixelStride == 1)
-            return Type.YUV_I420;
-        else
-            return Type.YUV_NV21;
+    @YuvType
+    static int detectType(ImageWrapper image) {
+        if (image.u.pixelStride == 1) {
+            return ImageFormat.YUV_420_888;
+        } else {
+            return ImageFormat.NV21;
+        }
     }
 
     static Converted toBuffer(ImageWrapper image, ByteBuffer reuse) {
-        Type type = detectType(image);
+        final int type = detectType(image);
         ByteBuffer output = prepareOutput(image, reuse);
         removePadding(image, type, output);
         return new Converted(type, output);
@@ -163,15 +167,20 @@ abstract public class Yuv {
                 || reuse.isReadOnly()
                 || !reuse.isDirect()) {
             output = ByteBuffer.allocateDirect(sizeOutput);
-        } else
+        } else {
             output = reuse;
+        }
         output.rewind();
         return output;
     }
 
     // Input buffers are always direct as described in
     // https://developer.android.com/reference/android/media/Image.Plane#getBuffer()
-    private static void removePadding(ImageWrapper image, Type type, ByteBuffer output) {
+    private static void removePadding(
+            ImageWrapper image,
+            @YuvType final int type,
+            ByteBuffer output
+    ) {
         int sizeLuma = image.y.width * image.y.height;
         int sizeChroma = image.u.width * image.u.height;
 
@@ -182,7 +191,7 @@ abstract public class Yuv {
             output.put(image.y.buffer);
         }
 
-        if (type.equals(Type.YUV_I420)) {
+        if (type == ImageFormat.YUV_420_888) {
             if (image.u.rowStride > image.u.width) {
                 removePaddingCompact(image.u, output, sizeLuma);
                 removePaddingCompact(image.v, output, sizeLuma + sizeChroma);
@@ -197,17 +206,23 @@ abstract public class Yuv {
                 removePaddingNotCompact(image, output, sizeLuma);
             } else {
                 output.position(sizeLuma);
-                output.put(image.v.buffer);
-                byte lastOne = image.u.buffer.get(image.u.buffer.capacity() - 1);
-                output.put(lastOne);
+                ByteBuffer uv = image.v.buffer;
+                final int properUVSize = image.v.height * image.v.rowStride - 1;
+                if (uv.capacity() > properUVSize) {
+                    uv = clipBuffer(image.v.buffer, 0, properUVSize);
+                }
+                output.put(uv);
+                final byte lastOne = image.u.buffer.get(image.u.buffer.capacity() - 1);
+                output.put(output.capacity() - 1, lastOne);
             }
         }
         output.rewind();
     }
 
     private static void removePaddingCompact(PlaneWrapper plane, ByteBuffer dst, int offset) {
-        if (plane.pixelStride != 1)
+        if (plane.pixelStride != 1) {
             throw new IllegalArgumentException("use removePaddingCompact with pixelStride == 1");
+        }
 
         ByteBuffer src = plane.buffer;
         int rowStride = plane.rowStride;
@@ -220,8 +235,9 @@ abstract public class Yuv {
     }
 
     private static void removePaddingNotCompact(ImageWrapper image, ByteBuffer dst, int offset) {
-        if (image.u.pixelStride != 2)
+        if (image.u.pixelStride != 2) {
             throw new IllegalArgumentException("use removePaddingNotCompact pixelStride == 2");
+        }
 
         int width = image.u.width;
         int height = image.u.height;
