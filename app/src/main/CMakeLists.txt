@@ -6,7 +6,7 @@ add_library(MNN SHARED IMPORTED)
 set_target_properties(
         MNN
         PROPERTIES IMPORTED_LOCATION
-        ${CMAKE_SOURCE_DIR}/jniLibs/${ANDROID_ABI}/libMNN.so
+        ${CMAKE_SOURCE_DIR}/jni/${ANDROID_ABI}/libMNN.so
 )
 
 file(GLOB_RECURSE CPP_SRCS
