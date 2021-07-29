@@ -1,5 +1,7 @@
 package ru.gordinmitya.yuv2buf;
 
+import android.graphics.ImageFormat;
+
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -12,7 +14,7 @@ public class ReuseTest {
     @Test
     public void test_reuse() {
         final int width = 10, height = 10;
-        Yuv.ImageWrapper image = YuvCommon.make(Yuv.Type.YUV_I420, width, height, width);
+        Yuv.ImageWrapper image = YuvCommon.make(ImageFormat.YUV_420_888, width, height, width);
         int size = width * height * 3 / 2;
         ByteBuffer correctReuse;
         ByteBuffer result;
@@ -28,11 +30,10 @@ public class ReuseTest {
         assertSame(correctReuse, result);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Test
     public void test_makesNew() {
         final int width = 10, height = 10;
-        Yuv.ImageWrapper image = YuvCommon.make(Yuv.Type.YUV_I420, width, height, width);
+        Yuv.ImageWrapper image = YuvCommon.make(ImageFormat.YUV_420_888, width, height, width);
         int size = width * height * 3 / 2;
         ByteBuffer incorrectReuse;
         ByteBuffer result;

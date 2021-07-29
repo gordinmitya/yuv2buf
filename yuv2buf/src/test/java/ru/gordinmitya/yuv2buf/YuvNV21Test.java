@@ -1,5 +1,6 @@
 package ru.gordinmitya.yuv2buf;
 
+import android.graphics.ImageFormat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,11 +34,11 @@ public class YuvNV21Test {
 
     @Test
     public void check() {
-        Yuv.ImageWrapper image = YuvCommon.make(Yuv.Type.YUV_NV21, width, height, rowStride);
+        Yuv.ImageWrapper image = YuvCommon.make(ImageFormat.NV21, width, height, rowStride);
         Yuv.Converted converted = Yuv.toBuffer(image, null);
         ByteBuffer buffer = converted.buffer;
 
-        assertEquals(Yuv.Type.YUV_NV21, converted.type);
+        assertEquals(ImageFormat.NV21, converted.type);
         assertEquals(0, buffer.position());
 
         int sizeY = width * height;

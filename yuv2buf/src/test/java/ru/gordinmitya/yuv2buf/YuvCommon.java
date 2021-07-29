@@ -1,5 +1,7 @@
 package ru.gordinmitya.yuv2buf;
 
+import android.graphics.ImageFormat;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,11 +33,11 @@ class YuvCommon {
         return rowStride * (height - 1) + width * pixelStride - pixelStride / 2;
     }
 
-    static Yuv.ImageWrapper make(Yuv.Type type, int width, int height, int rowStride) {
+    static Yuv.ImageWrapper make(@Yuv.YuvType int type, int width, int height, int rowStride) {
         assert rowStride >= width;
         Yuv.PlaneWrapper y = makeCompact(Y, width, height, rowStride);
         Yuv.PlaneWrapper u, v;
-        if (Yuv.Type.YUV_I420.equals(type)) {
+        if (ImageFormat.YUV_420_888 == type) {
             int stride = rowStride == width ? width / 2 : rowStride;
             u = makeCompact(U, width / 2, height / 2, stride);
             v = makeCompact(V, width / 2, height / 2, stride);
