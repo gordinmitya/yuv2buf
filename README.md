@@ -2,6 +2,14 @@
 
 ![](https://github.com/gordinmitya/yuv2buf/workflows/Android%20CI/badge.svg)
 
+## OUTDATED!
+7 years passed since CameraApi 2 was introduced in Android 5.
+So Google decided that it's time to make convenient way to get RGB images from it. 
+
+ImageAnalysis from CaemraX now supports setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888) [developer.android.com](https://developer.android.com/training/camerax/analyze#create-analyzer)
+
+Hovewer if you do not use CameraX for some reason - welcome!
+
 **Motivation:**
 
 When you're attempting to get an `Image` from `ImageReader` or `ImageAnalysis.Analyzer` you actually get 3 separate `ByteBuffers` which you can't pass to further processing. You have to merge them but that also is not easy because they are full of row and pixel strides.
