@@ -16,4 +16,4 @@ jobs:
         distribution: 'adopt'
         java-version: 11
     - name: Test with Gradle
-      run: ./gradlew test
+      run: ./gradlew yuv2buf:test
