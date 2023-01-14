@@ -26,7 +26,8 @@ class YuvCommon {
             {4, 10, 8},
             {4, 10, 4},
 
-            {864, 480, 896}
+            {864, 480, 896},
+            {1280, 720, 1536},
     });
 
     static int getBufferSize(int width, int height, int rowStride, int pixelStride) {

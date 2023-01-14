@@ -3,14 +3,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 30
-
     ndkVersion "22.0.7026061"
+    compileSdkVersion rootProject.compileSdk
+    buildToolsVersion rootProject.buildVer
 
     defaultConfig {
+        minSdkVersion rootProject.minSdk
+        targetSdkVersion rootProject.targetSdk
         applicationId "ru.gordinmitya.yuv2buf_demo"
-        minSdkVersion 21
-        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
