@@ -50,6 +50,68 @@ class YuvCommon {
         return new Yuv.ImageWrapper(width, height, y, u, v);
     }
 
+    static boolean checkOutput(@Yuv.YuvType int type, ByteBuffer buffer, int width, int height) {
+        if (ImageFormat.YUV_420_888 == type) {
+            return checkYuv420(buffer, width, height);
+        } else if (ImageFormat.NV21 == type) {
+            return checkNV21(buffer, width, height);
+        }
+        throw new IllegalArgumentException("Unknown type " + type);
+    }
+
+    static boolean checkYuv420(ByteBuffer buffer, int width, int height) {
+        byte[] array = buffer2array(buffer);
+
+        int sizeY = width * height;
+        int sizeChroma = sizeY / 4;
+        int sizeTotal = sizeY + sizeChroma * 2;
+
+        for (int i = 0; i < sizeY; i++) {
+            if (array[i] != Y) {
+                System.out.println("Missmatch at " + i + " expected " + Y + " but was " + array[i]);
+                return false;
+            }
+        }
+        for (int i = sizeY; i < sizeY + sizeChroma; i++) {
+            if (array[i] != U) {
+                System.out.println("Missmatch at " + i + " expected " + U + " but was " + array[i]);
+                return false;
+            }
+        }
+        for (int i = sizeY + sizeChroma; i < sizeTotal; i++) {
+            if (array[i] != V) {
+                System.out.println("Missmatch at " + i + " expected " + V + " but was " + array[i]);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    static boolean checkNV21(ByteBuffer buffer, int width, int height) {
+        byte[] array = buffer2array(buffer);
+
+        int sizeY = width * height;
+        int sizeChroma = sizeY / 4;
+        int sizeTotal = sizeY + sizeChroma * 2;
+
+        for (int i = 0; i < sizeY; i++) {
+            if (array[i] != Y) {
+                System.out.println("Missmatch at " + i + " expected " + Y + " but was " + array[i]);
+                return false;
+            }
+        }
+        for (int i = sizeY; i < sizeTotal; i++) {
+            byte expected = i % 2 == 0 ? V : U;
+            if (array[i] != expected) {
+                System.out.println("Missmatch at " + i + " expected " + expected + " but was " + array[i]);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     static byte[] buffer2array(ByteBuffer buffer) {
         byte[] array = new byte[buffer.capacity()];
         ByteBuffer copy = buffer.duplicate();

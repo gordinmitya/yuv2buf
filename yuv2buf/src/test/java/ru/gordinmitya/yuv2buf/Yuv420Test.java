@@ -10,10 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
-import static ru.gordinmitya.yuv2buf.YuvCommon.U;
-import static ru.gordinmitya.yuv2buf.YuvCommon.V;
-import static ru.gordinmitya.yuv2buf.YuvCommon.Y;
-import static ru.gordinmitya.yuv2buf.YuvCommon.buffer2array;
+import static org.junit.Assert.assertTrue;
 
 
 @RunWith(Parameterized.class)
@@ -45,15 +42,6 @@ public class Yuv420Test {
         int sizeChroma = sizeY / 4;
         int sizeTotal = sizeY + sizeChroma * 2;
         assertEquals(sizeTotal, buffer.capacity());
-        byte[] array = buffer2array(converted.buffer);
-
-        for (int i = 0; i < sizeY; i++)
-            assertEquals(Y, array[i]);
-
-        for (int i = sizeY; i < sizeY + sizeChroma; i++)
-            assertEquals(U, array[i]);
-
-        for (int i = sizeY + sizeChroma; i < sizeTotal; i++)
-            assertEquals(V, array[i]);
+        assertTrue(YuvCommon.checkYuv420(converted.buffer, width, height));
     }
 }
