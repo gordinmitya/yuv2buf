@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.compileSdk
@@ -7,23 +8,25 @@ android {
     defaultConfig {
         minSdkVersion rootProject.minSdk
         targetSdkVersion rootProject.targetSdk
-        versionCode 1
-        versionName "1.0"
 
-        consumerProguardFiles 'consumer-rules.pro'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
-
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
-    implementation 'androidx.camera:camera-core:1.0.0-beta03'
+    implementation "androidx.camera:camera-core:${rootProject.cameraCoreVersion}"
 
-    testImplementation 'junit:junit:4.13'
+    testImplementation project(':yuv2buf-shared-test')
+    testImplementation "junit:junit:${rootProject.junitVersion}"
+
+    androidTestImplementation project(':yuv2buf-shared-test')
+    androidTestImplementation "androidx.test:runner:1.5.2"
+    androidTestImplementation "androidx.test.ext:junit:1.1.5"
 }

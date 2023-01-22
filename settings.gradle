@@ -1,3 +1,4 @@
 rootProject.name='YUV2BUF'
 include ':app'
 include ':yuv2buf'
+include ':yuv2buf-shared-test'

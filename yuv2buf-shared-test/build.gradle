@@ -1,0 +1,18 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion rootProject.compileSdk
+    buildToolsVersion rootProject.buildVer
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdk
+        targetSdkVersion rootProject.targetSdk
+    }
+}
+
+dependencies {
+    implementation project(':yuv2buf')
+
+    testImplementation "junit:junit:${rootProject.junitVersion}"
+}

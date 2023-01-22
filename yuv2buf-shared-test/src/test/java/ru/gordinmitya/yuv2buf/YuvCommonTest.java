@@ -2,6 +2,7 @@ package ru.gordinmitya.yuv2buf;
 
 import android.graphics.ImageFormat;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -37,8 +38,8 @@ public class YuvCommonTest {
     public void test_getBufferSize() {
         int y = getBufferSize(864, 480, 896, 1);
         int chroma = getBufferSize(864 / 2, 480 / 2, 896, 2);
-        assertEquals(430048, y);
-        assertEquals(215007, chroma);
+        Assert.assertEquals(430048, y);
+        Assert.assertEquals(215007, chroma);
     }
 
     @Test
@@ -71,10 +72,10 @@ public class YuvCommonTest {
     }
 
     private static void assertPlaneParams(Yuv.PlaneWrapper plane, int width, int height, int rowStride, int pixelStride) {
-        assertEquals(width, plane.width);
-        assertEquals(height, plane.height);
-        assertEquals(rowStride, plane.rowStride);
-        assertEquals(pixelStride, plane.pixelStride);
+        Assert.assertEquals(width, plane.width);
+        Assert.assertEquals(height, plane.height);
+        Assert.assertEquals(rowStride, plane.rowStride);
+        Assert.assertEquals(pixelStride, plane.pixelStride);
     }
 
     private static void assertCompactPlane(Yuv.PlaneWrapper plane, byte element) {
@@ -85,7 +86,7 @@ public class YuvCommonTest {
                     break;
                 int expected = j < plane.width ? element : P;
                 int actual = array[i * plane.rowStride + j];
-                assertEquals(expected, actual);
+                Assert.assertEquals(expected, actual);
             }
         }
     }
@@ -100,10 +101,10 @@ public class YuvCommonTest {
                 if (j >= plane.width * 2 - offset && j < plane.rowStride - offset)
                     assertEquals(P, actual);
                 else if (j % 2 == 0)
-                    assertEquals(element, actual);
+                    Assert.assertEquals(element, actual);
                 else {
                     int other = element == U ? V : U;
-                    assertEquals(other, actual);
+                    Assert.assertEquals(other, actual);
                 }
             }
         }
